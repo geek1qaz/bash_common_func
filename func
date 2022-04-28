@@ -107,7 +107,7 @@ function LOGERRORMSG() # 打印日志: 失败级别, stderr
 }
 
 
-function read_conf() #读取section、keyword形式的配置文件 read_conf conf_file section key
+function read_conf() # 读取section、keyword形式的配置文件 read_conf conf_file section key
 {
     self_sect=$2;self_conf=$1;self_key=$3
     temp_conf=$(grep -vE "^$|^#" "$self_conf" | sed -n "/\[${self_sect}\]/I,/\[/p"  | sed "/^\[/d")
@@ -116,7 +116,7 @@ function read_conf() #读取section、keyword形式的配置文件 read_conf con
     eval "$(echo "$self_key"="$self_result")"
 }
 
-function read_conf_section() #读取section、keyword形式的配置文件并将整个section的所有k-v都声明出来 read_conf conf_file section
+function read_conf_section() # 读取section、keyword形式的配置文件并将整个section的所有k-v都声明出来 read_conf conf_file section
 {
   OLDIFS=$IFS
   IFS=$'\n'
@@ -130,7 +130,7 @@ function read_conf_section() #读取section、keyword形式的配置文件并将
   IFS=$OLDIFS
 }
 
-function getSections(){ #读取ini文件所有的sections ,参数个数 1,参数 1 :ini 文件名
+function getSections(){ # 读取ini文件所有的sections ,参数个数 1,参数 1 :ini 文件名
     if [ -f "$1" ];then
         sections=$(grep  -Po '(?<=\[).*(?=\])' "$1")
         echo "$sections"
@@ -139,7 +139,7 @@ function getSections(){ #读取ini文件所有的sections ,参数个数 1,参数
     fi
 }
 
-function check_var() { #如果变量2不在环境变量里,就读配置文件,如果配置文件也没有就报错退出
+function check_var() { # 如果变量2不在环境变量里,就读配置文件,如果配置文件也没有就报错退出
     # shellcheck disable=SC1090,SC1091,SC2034,SC2046,SC2086,SC2116,SC2154
     key=$(eval echo $(echo "$"$2))
     # shellcheck disable=SC1090,SC1091,SC2034,SC2046,SC2086,SC2116,SC2154
