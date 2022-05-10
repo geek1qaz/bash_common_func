@@ -21,88 +21,88 @@ today_now_d14=$(date +%Y%m%d%H%M%S)
 # shellcheck disable=SC1090,SC1091,SC2034,SC2046,SC2086,SC2116,SC2154
 today_now_sec=$(date +%s)
 # shellcheck disable=SC1090,SC1091,SC2034,SC2046,SC2086,SC2116,SC2154
-today_begin_d14=$(date -d "$(date +%F)" +%Y%m%d%H%M%S)
+today_begin_d14=$(date -d "$(date +%F)" +%Y%m%d%H%M%S) || true
 # shellcheck disable=SC1090,SC1091,SC2034,SC2046,SC2086,SC2116,SC2154
-today_begin_sec=$(date -d "$(date +%F)" +%s)
+today_begin_sec=$(date -d "$(date +%F)" +%s) || true
 
 # shellcheck disable=SC1090,SC1091,SC2034,SC2046,SC2086,SC2116,SC2154
-yestertoday_d8=$(date -d "-1 day $(date +%F)" +%Y%m%d)
+yestertoday_d8=$(date -d "-1 day $(date +%F)" +%Y%m%d) || true
 # shellcheck disable=SC1090,SC1091,SC2034,SC2046,SC2086,SC2116,SC2154
 yestertoday_now_d14=$(date +%Y%m%d%H%M%S -d "-1 day")
 # shellcheck disable=SC1090,SC1091,SC2034,SC2046,SC2086,SC2116,SC2154
 yestertoday_now_sec=$(date +%s -d "-1 day")
 # shellcheck disable=SC1090,SC1091,SC2034,SC2046,SC2086,SC2116,SC2154
-yestertoday_begin_d14=$(date -d "-1 day $(date +%F)" +%Y%m%d%H%M%S)
+yestertoday_begin_d14=$(date -d "-1 day $(date +%F)" +%Y%m%d%H%M%S) || true
 # shellcheck disable=SC1090,SC1091,SC2034,SC2046,SC2086,SC2116,SC2154
-yestertoday_begin_sec=$(date -d "-1 day $(date +%F)" +%s)
+yestertoday_begin_sec=$(date -d "-1 day $(date +%F)" +%s) || true
 
 
 # 所有日志函数返回值都是0, 执行日志函数的结果必为成功. 但是打印到屏幕是分为stdout和stderr的
 
 function LOGMSG() # 打印日志: 信息级别, stdout
 {
-    OLDIFS=$IFS
+    OLDIFS=${IFS}
     IFS=$' \t\n'
     time=$(date "+[%F %T]")
     echo -e "${time}\tINFO\t$*"
-    $SETCOLOR_NORMAL
+    ${SETCOLOR_NORMAL}
     # shellcheck disable=SC1090,SC1091,SC2034,SC2046,SC2086,SC2116,SC2154
-    [ -f "${log_file}" ] && echo -e "${time}\tINFO\t$*" >> "${log_file}"
-    IFS=$OLDIFS
+    [[ -f "${log_file}" ]] && echo -e "${time}\tINFO\t$*" >> "${log_file}"
+    IFS=${OLDIFS}
     return 0
 }
 
 function LOGWARNMSG() # 打印日志: 警告级别, stderr
 {
-    OLDIFS=$IFS
+    OLDIFS=${IFS}
     IFS=$' \t\n'
     time=$(date "+[%F %T]")
-    $SETCOLOR_WARNING
+    ${SETCOLOR_WARNING}
     echo -e "${time}\tWARN\t$*" >&2
-    $SETCOLOR_NORMAL
+    ${SETCOLOR_NORMAL}
     # shellcheck disable=SC1090,SC1091,SC2034,SC2046,SC2086,SC2116,SC2154
-    if [ -f "${log_err}" ]
+    if [[ -f "${log_err}" ]]
     then
             echo -e "${time}\tWARN\t$*" >> "${log_err}"
     fi
-    if [ -f "${log_file}" ]
+    if [[ -f "${log_file}" ]]
     then
             echo -e "${time}\tWARN\t$*" >> "${log_file}"
     fi
-    IFS=$OLDIFS
+    IFS=${OLDIFS}
     return 0
 }
 
 function LOGSUCMSG() # 打印日志: 成功级别, stdout
 {
-    OLDIFS=$IFS
+    OLDIFS=${IFS}
     IFS=$' \t\n'
     time=$(date "+[%F %T]")
-    $SETCOLOR_SUCCESS
+    ${SETCOLOR_SUCCESS}
     echo -e "${time}\tSUCCESS\t$*"
-    $SETCOLOR_NORMAL
-    [ -f "${log_file}" ] && echo -e "${time}\tSUCCESS\t$*" >> "${log_file}"
-    IFS=$OLDIFS
+    ${SETCOLOR_NORMAL}
+    [[ -f "${log_file}" ]] && echo -e "${time}\tSUCCESS\t$*" >> "${log_file}"
+    IFS=${OLDIFS}
     return 0
 }
 
 function LOGERRORMSG() # 打印日志: 失败级别, stderr
 {
-    OLDIFS=$IFS
+    OLDIFS=${IFS}
     IFS=$' \t\n'
     time=$(date "+[%F %T]")
-    $SETCOLOR_FAILURE
+    ${SETCOLOR_FAILURE}
     echo -e "${time}\tERROR\t$*" >&2
-    $SETCOLOR_NORMAL
-    if [ -f "${log_err}" ]
+    ${SETCOLOR_NORMAL}
+    if [[ -f "${log_err}" ]]
     then
             echo -e "${time}\tERROR\t$*" >> "${log_err}"
     fi
-    if [ -f "${log_file}" ]
+    if [[ -f "${log_file}" ]]
     then
             echo -e "${time}\tERROR\t$*" >> "${log_file}"
     fi
-    IFS=$OLDIFS
+    IFS=${OLDIFS}
     return 0
 }
 
@@ -110,30 +110,30 @@ function LOGERRORMSG() # 打印日志: 失败级别, stderr
 function read_conf() # 读取section、keyword形式的配置文件 read_conf conf_file section key
 {
     self_sect=$2;self_conf=$1;self_key=$3
-    temp_conf=$(grep -vE "^$|^#" "$self_conf" | sed -n "/\[${self_sect}\]/I,/\[/p"  | sed "/^\[/d")
-    self_result=$(echo "$temp_conf"|grep -i "$self_key"|cut -d= -f2|tail -n1)
+    temp_conf=$(grep -vE "^$|^#" "${self_conf}" | sed -n "/\[${self_sect}\]/I,/\[/p" | sed "/^\[/d")
+    self_result=$(echo "${temp_conf}" | grep -i "${self_key}" | cut -d= -f2 | tail -n1)
     # shellcheck disable=SC1090,SC1091,SC2034,SC2046,SC2086,SC2116,SC2154
-    eval "$(echo "$self_key"="$self_result")"
+    eval "$(echo "${self_key}"="${self_result}")"
 }
 
 function read_conf_section() # 读取section、keyword形式的配置文件并将整个section的所有k-v都声明出来 read_conf conf_file section
 {
-  OLDIFS=$IFS
+  OLDIFS=${IFS}
   IFS=$'\n'
   self_sect=$2;self_conf=$1
   temp_conf=$(grep -v ^# "$self_conf"|grep -v "^$"|sed -n "/\[${self_sect}\]/I,/^\[/p"|sed "/^\[/d")
-  for line in $temp_conf
+  for line in ${temp_conf}
   do
     #echo $line
-    eval "$line"
+    eval "${line}"
   done
-  IFS=$OLDIFS
+  IFS=${OLDIFS}
 }
 
 function getSections(){ # 读取ini文件所有的sections ,参数个数 1,参数 1 :ini 文件名
-    if [ -f "$1" ];then
+    if [[ -f "$1" ]];then
         sections=$(grep  -Po '(?<=\[).*(?=\])' "$1")
-        echo "$sections"
+        echo "${sections}"
     else
         echo "$1":配置文件不存在
     fi
@@ -143,10 +143,10 @@ function check_var() { # 如果变量2不在环境变量里,就读配置文件,�
     # shellcheck disable=SC1090,SC1091,SC2034,SC2046,SC2086,SC2116,SC2154
     key=$(eval echo $(echo "$"$2))
     # shellcheck disable=SC1090,SC1091,SC2034,SC2046,SC2086,SC2116,SC2154
-    [ "" == "${key}" ] && read_conf "${conf_file}" "$1" "$2"
+    [[ "" == "${key}" ]] && read_conf "${conf_file}" "$1" "$2"
     # shellcheck disable=SC1090,SC1091,SC2034,SC2046,SC2086,SC2116,SC2154
     key=$(eval echo $(echo "$"$2))
-    [ "" == "${key}" ] && LOGERRORMSG "$2 变量为空，请检查配置文件。 " && exit 3
+    [[ "" == "${key}" ]] && LOGERRORMSG "$2 变量为空，请检查配置文件。 " && exit 3
     unset key
 }
 
@@ -161,10 +161,10 @@ function quota_cpu() { # 限制CPU使用率, 使用方法: quota_cpu 限定使�
     local pid=$$
     local period_us=100000
     local quota_us
-    quota_us=$(echo "scale=0;$period_us"*"$quota/1" | bc)
+    quota_us=$(echo "scale=0;${period_us}"*"${quota}/1" | bc)
     pdir=/sys/fs/cgroup/cpu,cpuacct/${script_name}
     mkdir -p "${pdir}"
-    echo ${pid} > "${pdir}"/cgroup.procs
-    echo ${period_us} > "${pdir}"/cpu.cfs_period_us
+    echo "${pid}" > "${pdir}"/cgroup.procs
+    echo "${period_us}" > "${pdir}"/cpu.cfs_period_us
     echo "${quota_us}" > "${pdir}"/cpu.cfs_quota_us
 }
