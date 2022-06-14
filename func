@@ -111,7 +111,7 @@ function read_conf() # 读取section、keyword形式的配置文件 read_conf co
 {
     self_sect=$2;self_conf=$1;self_key=$3
     temp_conf=$(grep -vE "^$|^#" "${self_conf}" | sed -n "/\[${self_sect}\]/I,/\[/p" | sed "/^\[/d")
-    self_result=$(echo "${temp_conf}" | grep -i "${self_key}" | cut -d= -f2 | tail -n1)
+    self_result=$(echo "${temp_conf}" | grep -iw "${self_key}" | cut -d= -f2 | tail -n1)
     # shellcheck disable=SC1090,SC1091,SC2034,SC2046,SC2086,SC2116,SC2154
     eval "$(echo "${self_key}"="${self_result}")"
 }
