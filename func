@@ -1,5 +1,5 @@
 #!/bin/bash
-# 20220614
+# 20220624
 # han
 export LANG=en_US.UTF-8
 export LC_CTYPE=en_US.UTF-8
@@ -7,105 +7,111 @@ export 'NLS_LANG=american_america.AL32UTF8'
 
 
 #color level
-SETCOLOR_SUCCESS="echo -en \\033[1;32m"
-SETCOLOR_FAILURE="echo -en \\033[1;31m"
-SETCOLOR_WARNING="echo -en \\033[1;33m"
+SETCOLOR_DEBUG="echo -en \\033[1;37m"
 SETCOLOR_NORMAL="echo -en \\033[0;39m"
-
-
-# 定义一堆时间变量,方便调用
-# shellcheck disable=SC1090,SC1091,SC2034,SC2046,SC2086,SC2116,SC2154
-today_d8=$(date +%Y%m%d)
-# shellcheck disable=SC1090,SC1091,SC2034,SC2046,SC2086,SC2116,SC2154
-today_now_d14=$(date +%Y%m%d%H%M%S)
-# shellcheck disable=SC1090,SC1091,SC2034,SC2046,SC2086,SC2116,SC2154
-today_now_sec=$(date +%s)
-# shellcheck disable=SC1090,SC1091,SC2034,SC2046,SC2086,SC2116,SC2154
-today_begin_d14=$(date -d "$(date +%F)" +%Y%m%d%H%M%S) || true
-# shellcheck disable=SC1090,SC1091,SC2034,SC2046,SC2086,SC2116,SC2154
-today_begin_sec=$(date -d "$(date +%F)" +%s) || true
-
-# shellcheck disable=SC1090,SC1091,SC2034,SC2046,SC2086,SC2116,SC2154
-yestertoday_d8=$(date -d "-1 day $(date +%F)" +%Y%m%d) || true
-# shellcheck disable=SC1090,SC1091,SC2034,SC2046,SC2086,SC2116,SC2154
-yestertoday_now_d14=$(date +%Y%m%d%H%M%S -d "-1 day")
-# shellcheck disable=SC1090,SC1091,SC2034,SC2046,SC2086,SC2116,SC2154
-yestertoday_now_sec=$(date +%s -d "-1 day")
-# shellcheck disable=SC1090,SC1091,SC2034,SC2046,SC2086,SC2116,SC2154
-yestertoday_begin_d14=$(date -d "-1 day $(date +%F)" +%Y%m%d%H%M%S) || true
-# shellcheck disable=SC1090,SC1091,SC2034,SC2046,SC2086,SC2116,SC2154
-yestertoday_begin_sec=$(date -d "-1 day $(date +%F)" +%s) || true
-
+SETCOLOR_SUCCESS="echo -en \\033[1;32m"
+SETCOLOR_ERROR="echo -en \\033[1;31m"
+SETCOLOR_WARNING="echo -en \\033[1;33m"
 
 # 所有日志函数返回值都是0, 执行日志函数的结果必为成功. 但是打印到屏幕是分为stdout和stderr的
+script_name=$(basename "$0")
 
-function LOGMSG() # 打印日志: 信息级别, stdout
+function LOGINFO() # 打印日志: 信息级别, stdout
 {
     OLDIFS=${IFS}
     IFS=$' \t\n'
     time=$(date "+[%F %T]")
-    echo -e "${time}\tINFO\t$*"
+    local msg
+    msg="${time}\tINFO\t${script_name}\t$*"
+    echo -e "${msg}"
     ${SETCOLOR_NORMAL}
     # shellcheck disable=SC1090,SC1091,SC2034,SC2046,SC2086,SC2116,SC2154
-    [[ -f "${log_file}" ]] && echo -e "${time}\tINFO\t$*" >> "${log_file}"
+    [[ -f "${log_file}" ]] && echo -e "${msg}" >> "${log_file}"
     IFS=${OLDIFS}
     return 0
 }
 
-function LOGWARNMSG() # 打印日志: 警告级别, stderr
+function LOGSUCCESS() # 打印日志: 成功级别, stdout
 {
     OLDIFS=${IFS}
     IFS=$' \t\n'
     time=$(date "+[%F %T]")
-    ${SETCOLOR_WARNING}
-    echo -e "${time}\tWARN\t$*" >&2
-    ${SETCOLOR_NORMAL}
-    # shellcheck disable=SC1090,SC1091,SC2034,SC2046,SC2086,SC2116,SC2154
-    if [[ -f "${log_err}" ]]
-    then
-            echo -e "${time}\tWARN\t$*" >> "${log_err}"
-    fi
-    if [[ -f "${log_file}" ]]
-    then
-            echo -e "${time}\tWARN\t$*" >> "${log_file}"
-    fi
-    IFS=${OLDIFS}
-    return 0
-}
-
-function LOGSUCMSG() # 打印日志: 成功级别, stdout
-{
-    OLDIFS=${IFS}
-    IFS=$' \t\n'
-    time=$(date "+[%F %T]")
+    local msg
+    msg="${time}\tSUCCESS\t${script_name}\t$*"
     ${SETCOLOR_SUCCESS}
-    echo -e "${time}\tSUCCESS\t$*"
+    echo -e "${msg}"
     ${SETCOLOR_NORMAL}
-    [[ -f "${log_file}" ]] && echo -e "${time}\tSUCCESS\t$*" >> "${log_file}"
+    [[ -f "${log_file}" ]] && echo -e "${msg}" >> "${log_file}"
     IFS=${OLDIFS}
     return 0
 }
 
-function LOGERRORMSG() # 打印日志: 失败级别, stderr
+function LOGWARNNING() # 打印日志: 警告级别, stderr
 {
     OLDIFS=${IFS}
     IFS=$' \t\n'
     time=$(date "+[%F %T]")
-    ${SETCOLOR_FAILURE}
-    echo -e "${time}\tERROR\t$*" >&2
+    local msg
+    msg="${time}\tWARN\t${script_name}\t$*"
+    ${SETCOLOR_WARNING}
+    echo -e "${msg}" >&2
     ${SETCOLOR_NORMAL}
+    # shellcheck disable=SC1090,SC1091,SC2034,SC2046,SC2086,SC2116,SC2154
     if [[ -f "${log_err}" ]]
     then
-            echo -e "${time}\tERROR\t$*" >> "${log_err}"
+            echo -e "${msg}" >> "${log_err}"
     fi
     if [[ -f "${log_file}" ]]
     then
-            echo -e "${time}\tERROR\t$*" >> "${log_file}"
+            echo -e "${msg}" >> "${log_file}"
     fi
     IFS=${OLDIFS}
     return 0
 }
 
+function LOGERROR() # 打印日志: 失败级别, stderr
+{
+    OLDIFS=${IFS}
+    IFS=$' \t\n'
+    time=$(date "+[%F %T]")
+    local msg
+    msg="${time}\tERROR\t${script_name}\t$*"
+    ${SETCOLOR_ERROR}
+    echo -e "${msg}" >&2
+    ${SETCOLOR_NORMAL}
+    if [[ -f "${log_err}" ]]
+    then
+            echo -e "${msg}" >> "${log_err}"
+    fi
+    if [[ -f "${log_file}" ]]
+    then
+            echo -e "${msg}" >> "${log_file}"
+    fi
+    IFS=${OLDIFS}
+    return 0
+}
+
+function LOGDEBUG() # 打印日志: 失败级别, stderr
+{
+    OLDIFS=${IFS}
+    IFS=$' \t\n'
+    time=$(date "+[%F %T]")
+    local msg
+    msg="${time}\tDEBUG\t${script_name}\t$*"
+    ${SETCOLOR_DEBUG}
+    echo -e "${msg}" >&2
+    ${SETCOLOR_NORMAL}
+    if [[ -f "${log_err}" ]]
+    then
+            echo -e "${msg}" >> "${log_err}"
+    fi
+    if [[ -f "${log_file}" ]]
+    then
+            echo -e "${msg}" >> "${log_file}"
+    fi
+    IFS=${OLDIFS}
+    return 0
+}
 
 function read_conf() # 读取section、keyword形式的配置文件 read_conf conf_file section key
 {
