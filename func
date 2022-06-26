@@ -14,7 +14,7 @@ SETCOLOR_ERROR="echo -en \\033[1;31m"
 SETCOLOR_WARNING="echo -en \\033[1;33m"
 
 # 所有日志函数返回值都是0, 执行日志函数的结果必为成功. 但是打印到屏幕是分为stdout和stderr的
-script_name=$(basename "$0")
+script_name=$(basename "$0" 2>/dev/null)
 
 function LOGINFO() # 打印日志: 信息级别, stdout
 {
