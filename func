@@ -152,13 +152,13 @@ function check_var() { # 如果变量2不在环境变量里,就读配置文件,�
     [[ "" == "${key}" ]] && read_conf "${conf_file}" "$1" "$2"
     # shellcheck disable=SC1090,SC1091,SC2034,SC2046,SC2086,SC2116,SC2154
     key=$(eval echo $(echo "$"$2))
-    [[ "" == "${key}" ]] && LOGERRORMSG "$2 变量为空，请检查配置文件。 " && exit 3
+    [[ "" == "${key}" ]] && LOGERROR "$2 变量为空，请检查配置文件。 " && exit 3
     unset key
 }
 
 function quota_cpu() { # 限制CPU使用率, 使用方法: quota_cpu 限定使用的核数, 注意调用该函数的脚本在执行完成后需自行删除 ${pdir} cgdelete -r cpu,cpuacct:${script_name}
     if ! (ls /sys/fs/cgroup/cpu,cpuacct &>/dev/null); then
-        LOGERRORMSG "该机器未安装cgroup, 无法控制cpu使用率"
+        LOGERROR "该机器未安装cgroup, 无法控制cpu使用率"
         return
     fi
     local quota=$1
