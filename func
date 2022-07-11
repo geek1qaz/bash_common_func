@@ -1,5 +1,5 @@
 #!/bin/bash
-# 20220624
+# 20220711
 # han
 export LANG=en_US.UTF-8
 export LC_CTYPE=en_US.UTF-8
@@ -145,14 +145,14 @@ function getSections(){ # 读取ini文件所有的sections ,参数个数 1,参�
     fi
 }
 
-function check_var() { # 如果变量2不在环境变量里,就读配置文件,如果配置文件也没有就报错退出
+function check_var() { # 如果变量3不在环境变量里,就读配置文件,如果配置文件也没有就报错退出
     # shellcheck disable=SC1090,SC1091,SC2034,SC2046,SC2086,SC2116,SC2154
-    key=$(eval echo $(echo "$"$2))
+    key=$(eval echo $(echo "$"$3))
     # shellcheck disable=SC1090,SC1091,SC2034,SC2046,SC2086,SC2116,SC2154
-    [[ "" == "${key}" ]] && read_conf "${conf_file}" "$1" "$2"
+    [[ "" == "${key}" ]] && read_conf "$1" "$2" "$3"
     # shellcheck disable=SC1090,SC1091,SC2034,SC2046,SC2086,SC2116,SC2154
-    key=$(eval echo $(echo "$"$2))
-    [[ "" == "${key}" ]] && LOGERROR "$2 变量为空，请检查配置文件。 " && exit 3
+    key=$(eval echo $(echo "$"$3))
+    [[ "" == "${key}" ]] && LOGERROR "$3 变量为空，请检查配置文件。 " && exit 3
     unset key
 }
 
